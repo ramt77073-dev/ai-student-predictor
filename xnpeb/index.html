@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Student Predictor</title>
+    </head>
+    <body>
+        <h2>Pass Prediction</h2>
+
+        <input type="number" id="hours" placeholder="Hours">
+        <input type="number" id="marks" placeholder="Marks">
+
+        <button onclick="predict()">Predict</button>
+
+        <h3 id="result"></h3>
+
+        <script>
+            async function predict() {
+                let hours = document.getElementById("hours").value;
+                let marks = document.getElementById("marks").value;
+
+                let response = await fetch("http://127.0.0.1:8000/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        hours: parseFloat(hours),
+                        marks: parseFloat(marks)
+                    })
+                });
+
+                let data = await response.json();
+                document.getElementById("result").innerText = 
+                    "Result: " + data.result +
+                    " | Probability: " + data.pass_probability;
+            }
+        </script>
+    </body>
+</html>
