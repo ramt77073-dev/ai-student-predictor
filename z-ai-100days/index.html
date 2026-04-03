@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Iris Predictor</title>
+        <style>
+            body {
+                font-family: Arial;
+                background: linear-gradient(to right, #1f4037, #99f2c8);
+                text-align: center;
+                padding: 50px;
+            }
+
+            .box {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                width: 300px;
+                margin: auto;
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            }
+
+            input {
+                width: 90%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            button {
+                padding: 10px 20px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background: #14532d;
+            }
+
+            h1 {
+                color: white;
+            }
+
+            #result {
+                margin-top: 20px;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Iris Flower Predictor</h1>
+        <p style="color: white;">Enter flower measurements to predict the species:</p>
+        <div class="box">
+            <input type="number" id="sepal_length" placeholder="sepal Length" step="any"><br><br>
+            <input type="number" id="sepal_width" placeholder="sepal Width" step="any"><br><br>
+            <input type="number" id="petal_length" placeholder="petal Length" step="any"><br><br>
+            <input type="number" id="petal_width" placeholder="petal Width" step="any"><br><br>
+
+            <button id="predict-btn" onclick="predictFlower()">Predict</button>
+
+            <h2 id="result"></h2>
+        </div>
+
+        <p style="color: white; margin-top:30px;">
+            Built by Teja
+        </p>
+
+        <script>
+            async function predictFlower() {
+                let resultBox = document.getElementById("result");
+                let btn = document.getElementById("predict-btn");
+
+                resultBox.style.color = "black";
+                resultBox.innerText = "Predicting...";
+                btn.disabled = true;
+                btn.innerText = "Predicting...";
+
+                let sepal_length = parseFloat(document.getElementById("sepal_length").value);
+                let sepal_width = parseFloat(document.getElementById("sepal_width").value);
+                let petal_length = parseFloat(document.getElementById("petal_length").value);
+                let petal_width = parseFloat(document.getElementById("petal_width").value);
+
+                if (
+                    isNaN(sepal_length) ||
+                    isNaN(sepal_width) ||
+                    isNaN(petal_length) ||
+                    isNaN(petal_width)
+                ) {
+                    resultBox.style.color = "red";
+                    resultBox.innerText = "Please fill all fields";
+                    btn.disabled = false;
+                    btn.innerText = "Predict";
+                    return;
+                }
+
+                try {
+                    let response = await fetch("http://localhost:8000/predict", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            sepal_length: sepal_length,
+                            sepal_width: sepal_width,
+                            petal_length: petal_length,
+                            petal_width: petal_width
+                        })
+                    });
+                    let data = await response.json();
+
+                    const colors = {"setosa": "green", "versicolor": "orange", "virginica": "blue"};
+                    resultBox.style.color = colors[data.prediction_name] || "black";
+                    resultBox.innerText = "Prediction: " + data.prediction_name;
+
+                    document.getElementById("sepal_length").value = "";
+                    document.getElementById("sepal_width").value = "";
+                    document.getElementById("petal_length").value = "";
+                    document.getElementById("petal_width").value = "";
+
+                    btn.disabled = false;
+                    btn.innerText = "Predict";
+                }
+                catch (error) {
+                    console.error("Error:", error);
+                    resultBox.style.color = "red";
+                    resultBox.innerText = "Server not running. Start backend!";
+                    btn.disabled = false;
+                    btn.innerText = "Predict";
+                }
+            }
+        </script>
+    </body>
+</html>

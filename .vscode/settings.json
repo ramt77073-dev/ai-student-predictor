@@ -1,0 +1,5 @@
+{
+    "python.defaultInterpreterPath": "c:\\Users\\ramt7\\OneDrive\\Desktop\\ai-100-days\\.venv\\Scripts\\python.exe",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
+}
